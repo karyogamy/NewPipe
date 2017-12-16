@@ -16,6 +16,8 @@ import org.acra.config.ACRAConfigurationException;
 import org.acra.config.ConfigurationBuilder;
 import org.acra.sender.ReportSenderFactory;
 import org.schabi.newpipe.extractor.NewPipe;
+import org.schabi.newpipe.pybridge.AssetExtractor;
+import org.schabi.newpipe.pybridge.PyBridge;
 import org.schabi.newpipe.report.AcraReportSenderFactory;
 import org.schabi.newpipe.report.ErrorActivity;
 import org.schabi.newpipe.report.UserAction;
@@ -81,6 +83,14 @@ public class App extends Application {
         ImageLoader.getInstance().init(config);
 
         configureRxJavaErrorHandler();
+        setupPybridge();
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        // Stop the interpreter
+        PyBridge.stop();
     }
 
     private void configureRxJavaErrorHandler() {
@@ -148,5 +158,18 @@ public class App extends Application {
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.createNotificationChannel(mChannel);
+    }
+
+    public void setupPybridge() {
+        // Extract python files from assets
+        AssetExtractor assetExtractor = new AssetExtractor(this);
+        assetExtractor.removeAssets("python");
+        assetExtractor.copyAssets("python");
+
+        // Get the extracted assets directory
+        String pythonPath = assetExtractor.getAssetsDataDir() + "python";
+
+        // Start the Python interpreter
+        PyBridge.start(pythonPath);
     }
 }

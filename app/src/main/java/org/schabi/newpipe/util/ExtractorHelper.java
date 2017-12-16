@@ -31,6 +31,7 @@ import org.schabi.newpipe.extractor.playlist.PlaylistInfo;
 import org.schabi.newpipe.extractor.search.SearchEngine;
 import org.schabi.newpipe.extractor.search.SearchResult;
 import org.schabi.newpipe.extractor.stream.StreamInfo;
+import org.schabi.newpipe.pybridge.GenericStreamInfo;
 
 import java.io.InterruptedIOException;
 import java.util.List;
@@ -94,7 +95,7 @@ public final class ExtractorHelper {
         return checkCache(forceLoad, serviceId, url, Single.fromCallable(new Callable<StreamInfo>() {
             @Override
             public StreamInfo call() throws Exception {
-                return StreamInfo.getInfo(NewPipe.getService(serviceId), url);
+                return GenericStreamInfo.getInfo(url);
             }
         }));
     }
