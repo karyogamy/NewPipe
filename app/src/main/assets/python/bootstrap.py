@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 import youtube_dl
 import json
 import sys
+import os
 
 class PassThroughLogger(object):
     def isatty(self):
@@ -20,6 +21,11 @@ class PassThroughLogger(object):
         print(msg)
 
 sys.stderr = PassThroughLogger()
+
+# ssl certificate hack for android, since android cacerts format does not conform with python openssl
+os.environ["SSL_CERT_FILE"] = '/data/user/0/org.schabi.newpipe.debug/assets/python/cacert.pem'
+print(os.environ["SSL_CERT_FILE"])
+
 
 def router(args):
     """
@@ -52,7 +58,13 @@ def wait(args):
 
 def dl(args):
     ydl_opts = {
-        'nocheckcertificate': True, # ssl not working yet
+        'restrictfilenames': True,
+        'youtube_include_dash_manifest': False, # DASH are not support atm, remove this later
+        'geo_bypass': True, # bypass geographic blocks
+        'nocheckcertificate': False, # toggle if not using ssl cert hack
+        'socket_timeout': 20, # timeout of 20s
+        'default_search': 'auto', # let youtube-dl guess url if given is invalid
+        'encoding': 'UTF-8',
         'logger': PassThroughLogger(),
         'cachedir': args['path'],
         'outtmpl': args['path'] + '%(title)s.%(ext)s',

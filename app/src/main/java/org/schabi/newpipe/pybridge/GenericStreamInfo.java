@@ -83,8 +83,10 @@ public class GenericStreamInfo {
             final JSONObject format = formats.getJSONObject(i);
 
             // Filter out hls or dash videos
-            if (!format.getString("protocol").equals("https")) {
-                nonHttpsProtocolUrls.add(format.getString("manifest_url"));
+            if (!format.getString("protocol").equals("https") && format.has("manifest_url")) {
+                if (format.has("manifest_url")) {
+                    nonHttpsProtocolUrls.add(format.getString("manifest_url"));
+                }
                 continue;
             }
 

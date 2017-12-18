@@ -91,7 +91,7 @@ public final class ExtractorHelper {
     }
 
     public static Single<StreamInfo> getStreamInfo(final int serviceId, final String url, boolean forceLoad) {
-        checkServiceId(serviceId);
+        //checkServiceId(serviceId);
         return checkCache(forceLoad, serviceId, url, Single.fromCallable(new Callable<StreamInfo>() {
             @Override
             public StreamInfo call() throws Exception {

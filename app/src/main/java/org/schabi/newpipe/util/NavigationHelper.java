@@ -287,7 +287,7 @@ public class NavigationHelper {
         try {
             intentByLink = getIntentByLink(context, url);
         } catch (ExtractionException e) {
-            return false;
+            intentByLink = getOpenIntent(context, url, 0, StreamingService.LinkType.STREAM);
         }
         intentByLink.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intentByLink.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
