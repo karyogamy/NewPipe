@@ -147,6 +147,7 @@ public class VideoDetailFragment extends BaseStateFragment<StreamInfo> implement
     private TextView detailControlsBackground;
     private TextView detailControlsPopup;
     private TextView detailControlsAddToPlaylist;
+    private TextView detailControlDownload;
     private TextView appendControlsDetail;
 
     private LinearLayout videoDescriptionRootLayout;
@@ -335,6 +336,9 @@ public class VideoDetailFragment extends BaseStateFragment<StreamInfo> implement
                             .show(getFragmentManager(), TAG);
                 }
                 break;
+            case R.id.detail_controls_download:
+                onDownloadClicked();
+                break;
             case R.id.detail_uploader_root_layout:
                 if (TextUtils.isEmpty(currentInfo.getUploaderUrl())) {
                     Log.w(TAG, "Can't open channel because we got no channel URL");
@@ -438,6 +442,7 @@ public class VideoDetailFragment extends BaseStateFragment<StreamInfo> implement
         detailControlsBackground = rootView.findViewById(R.id.detail_controls_background);
         detailControlsPopup = rootView.findViewById(R.id.detail_controls_popup);
         detailControlsAddToPlaylist = rootView.findViewById(R.id.detail_controls_playlist_append);
+        detailControlDownload = rootView.findViewById(R.id.detail_controls_download);
         appendControlsDetail = rootView.findViewById(R.id.touch_append_detail);
 
         videoDescriptionRootLayout = rootView.findViewById(R.id.detail_description_root_layout);
@@ -489,6 +494,8 @@ public class VideoDetailFragment extends BaseStateFragment<StreamInfo> implement
         detailControlsBackground.setOnClickListener(this);
         detailControlsPopup.setOnClickListener(this);
         detailControlsAddToPlaylist.setOnClickListener(this);
+        detailControlDownload.setOnClickListener(this);
+        
         relatedStreamExpandButton.setOnClickListener(this);
 
         detailControlsBackground.setLongClickable(true);
@@ -651,23 +658,6 @@ public class VideoDetailFragment extends BaseStateFragment<StreamInfo> implement
                 } catch (Exception e) {
                     if(DEBUG) Log.i(TAG, "Failed to start kore", e);
                     showInstallKoreDialog(activity);
-                }
-            }
-        });
-
-        actionBarHandler.setOnDownloadListener(new ActionBarHandler.OnActionListener() {
-            @Override
-            public void onActionSelected(int selectedStreamId) {
-                if (!PermissionHelper.checkStoragePermissions(activity)) {
-                    return;
-                }
-
-                try {
-                    DownloadDialog downloadDialog = DownloadDialog.newInstance(info, sortedStreamVideosList, selectedStreamId);
-                    downloadDialog.show(activity.getSupportFragmentManager(), "downloadDialog");
-                } catch (Exception e) {
-                    Toast.makeText(activity, R.string.could_not_setup_download_menu, Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
                 }
             }
         });
@@ -988,6 +978,25 @@ public class VideoDetailFragment extends BaseStateFragment<StreamInfo> implement
         setErrorImage(imageError);
     }
 
+    private void onDownloadClicked() {
+        if (activity == null || currentInfo == null || sortedStreamVideosList == null ||
+                !PermissionHelper.checkStoragePermissions(activity)) {
+            return;
+        }
+
+        final int selectedStream = actionBarHandler == null ?
+                0 : actionBarHandler.getSelectedVideoStream();
+
+        try {
+            DownloadDialog downloadDialog = DownloadDialog.newInstance(currentInfo,
+                    sortedStreamVideosList, selectedStream);
+            downloadDialog.show(activity.getSupportFragmentManager(), "downloadDialog");
+        } catch (Exception e) {
+            Toast.makeText(activity, R.string.could_not_setup_download_menu, Toast.LENGTH_LONG)
+                    .show();
+            e.printStackTrace();
+        }
+    }
     /*//////////////////////////////////////////////////////////////////////////
     // Contract
     //////////////////////////////////////////////////////////////////////////*/
